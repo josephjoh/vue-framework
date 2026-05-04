@@ -23,10 +23,16 @@ export interface ApiResponse<T> {
   }
 }
 
+// export interface ApiError {
+//   RES_ERR: {
+//     errorCode: string
+//     errorMsg: string
+//     errorAddMsg: string
+//   }
+// }
+
 export interface ApiError {
-  RES_ERR: {
-    errorCode: string
-    errorMsg: string
-    errorAddMsg: string
-  }
+  errorCode: string
+  errorMsg: string
+  errorAddMsg: string
 }

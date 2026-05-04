@@ -26,6 +26,12 @@ http.interceptors.request.use(
     // if (authStore.accessToken) {
     //   config.headers.Authorization = `Bearer ${authStore.accessToken}`
     // }
+    console.log('config _skipGlobalError >> ', config._skipGlobalError)
+    if (!config._skipGlobalError) {
+      console.log('config _skipGlobalError false >> ', config._skipGlobalError)
+    } else {
+      console.log('config _skipGlobalError true >> ', config._skipGlobalError)
+    }
     return config
   },
   (error) => Promise.reject(error)
@@ -46,6 +52,7 @@ http.interceptors.response.use(
     if (error.response) {
       const status = error.response?.status
       const originalRequest = error.config
+      console.log('originalRequest >> ', originalRequest)
 
       if (status === 401 && !originalRequest._retry) {
         originalRequest._retry = true
@@ -68,56 +75,31 @@ http.interceptors.response.use(
       switch(statusGroup) {
         case 400:
         case 500:
-          return Promise.reject({
-            RES_ERR: {
-              errorCode: '400500',
-              errorMsg: '400500에러',
-              errorAddMsg: '400500에러 발생',
-            }
+          return Promise.reject({ // 실제 error.response.data.RES_ERR 객체 들어옴
+            // RES_ERR: {
+            //   errorCode: '400500',
+            //   errorMsg: '400500에러',
+            //   errorAddMsg: '400500에러 발생',
+            // }
+            errorCode: '400500',
+            errorMsg: '400500에러',
+            errorAddMsg: '400500에러 발생',
           })
         default:
           return Promise.reject(error.response.data.RES_ERR)
       }
     } else {
       return Promise.reject({
-        RES_ERR: {
-          errorCode: '!400500',
-          errorMsg: '!400500에러 알 수 없는 오류가 발생했습니다.',
-          errorAddMsg: '!400500에러 알 수 없는 오류 추가가 발생했습니다.',
-        }
+        // RES_ERR: {
+        //   errorCode: '!400500',
+        //   errorMsg: '!400500에러 알 수 없는 오류가 발생했습니다.',
+        //   errorAddMsg: '!400500에러 알 수 없는 오류 추가가 발생했습니다.',
+        // }
+        errorCode: '!400500',
+        errorMsg: '!400500에러 알 수 없는 오류가 발생했습니다.',
+        errorAddMsg: '!400500에러 알 수 없는 오류 추가가 발생했습니다.',
       })
     }
-  //   const originalRequest = error.config
-
-  //   // 401: 토큰 만료 → refresh 시도 후 재요청
-  //   if (error.response?.status === 401 && !originalRequest._retry) {
-  //     originalRequest._retry = true
-
-  //     const authStore = useAuthStore()
-  //     const refreshToken = authStore.refreshToken
-
-  //     if (refreshToken) {
-  //       try {
-          // const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken })
-          // const newToken: string = data.data.accessToken
-          // authStore.accessToken = newToken
-          // localStorage.setItem('accessToken', newToken)
-          // originalRequest.headers.Authorization = `Bearer ${newToken}`
-          // return http(originalRequest)
-  //       } catch {
-  //         authStore.logout()
-  //         window.location.href = '/login'
-  //         return Promise.reject(error)
-  //       }
-  //     } else {
-  //       authStore.logout()
-  //       window.location.href = '/login'
-  //     }
-  //   }
-
-  //   const message =
-  //     error.response?.data?.message || error.message || '알 수 없는 오류가 발생했습니다.'
-  //   return Promise.reject(new Error(message))
   }
 )
 

@@ -5,9 +5,9 @@ import type { AxiosRequestConfig } from 'axios'
 
 export const useServiceApi = () => {
 	const route = useRoute()
-
-  const callPostApi = async<TReq, TRes>(
-  	serviceId: string,
+	
+	const callPostApi = async<TReq, TRes>(
+		serviceId: string,
     payload: TReq,
 		config?: AxiosRequestConfig
 	): Promise<ApiResponse<TRes>> => {
@@ -17,7 +17,7 @@ export const useServiceApi = () => {
         serviceId,
         screenId,
 				langCd: 'KO',
-				clientTimeString: '',
+				clientTimeString: new Date().toLocaleDateString(),
       },
       REQ_DAT: payload
   	}
