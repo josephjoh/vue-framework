@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from '@/api/services/auth'
+import { useMenuStore } from '@/stores/menu'
 import type { User, LoginRequest } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -23,6 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
       role: 'user',
       createdAt: new Date().toISOString(),
     }
+    await useMenuStore().fetchMenu(user.value.role)
   }
 
   async function logout() {
@@ -30,6 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
       await authApi.logout() // 서버가 쿠키 삭제
     } finally {
       _clearAuth()
+      useMenuStore().clearMenus()
     }
   }
 
