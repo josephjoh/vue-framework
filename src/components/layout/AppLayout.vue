@@ -41,19 +41,7 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted } from 'vue'
   import AppHeader from './AppHeader.vue'
   import AppSidebar from './AppSidebar.vue'
   import AppFooter from './AppFooter.vue'
-  import { useAuthStore } from '@/stores/auth'
-  import { useMenuStore } from '@/stores/menu'
-
-  const authStore = useAuthStore()
-  const menuStore = useMenuStore()
-
-  onMounted(async () => {
-    if (menuStore.menus.length === 0) {
-      await menuStore.fetchMenus(authStore.userRole)
-    }
-  })
 </script>
