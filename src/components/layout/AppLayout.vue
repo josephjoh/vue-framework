@@ -53,7 +53,7 @@
 
   onMounted(async () => {
     if (menuStore.menus.length === 0) {
-      await menuStore.fetchMenu(authStore.userRole)
+      await menuStore.fetchMenus(authStore.userRole)
     }
   })
 </script>

@@ -7,7 +7,8 @@ export interface User {
   createdAt: string
 }
 
-export type UserRole = 'admin' | 'user' | 'guest'
+// export type UserRole = 'admin' | 'user' | 'guest'
+export type UserRole = '1' | '2' | '3'
 
 export interface LoginRequest {
   email: string

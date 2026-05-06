@@ -18,14 +18,6 @@ import { pubRoutes } from './modules/pub'
 //   }
 // })
 
-// declare module 'vue-router' {
-//   interface RouteMeta {
-//     requiresAuth?: boolean
-//     guestOnly?: boolean
-//     title?: string
-//   }
-// }
-
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -87,16 +79,7 @@ router.beforeEach(async (to) => {
 
   // 메뉴 미로드 시 fetch (새로고침 대비 — AppLayout onMounted보다 먼저 실행됨)
   if (to.name !== 'Login' && to.name !== 'NotFound' && menuStore.menus.length === 0) {
-    await menuStore.fetchMenu(authStore.userRole)
-  }
-
-  // 메뉴 권한 체크: permissionMap에 등록된 경로만 검사
-  if (to.name !== 'Login' && to.name !== 'NotFound') {
-    const allowedRoles = menuStore.permissionMap.get(to.path)
-    if (allowedRoles !== undefined && !allowedRoles.includes(authStore.userRole)) {
-      alert('해당 메뉴에 대한 접근 권한이 없습니다.')
-      return authStore.isAuthenticated ? { name: 'Home' } : { name: 'Login' }
-    }
+    await menuStore.fetchMenus(authStore.userRole)
   }
 })
 

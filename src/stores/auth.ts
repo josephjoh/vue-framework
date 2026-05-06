@@ -8,7 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
 
   const isAuthenticated = computed(() => !!user.value)
-  const userRole = computed(() => user.value?.role ?? 'guest')
+  const userRole = computed(() => user.value?.role ?? '1')
 
   async function login(credentials: LoginRequest) {
     // TODO: 백엔드 응답 구조 확인 후 복원
@@ -21,10 +21,10 @@ export const useAuthStore = defineStore('auth', () => {
       id: 1,
       name: '테스트 사용자',
       email: 'test@example.com',
-      role: 'user',
+      role: '1',
       createdAt: new Date().toISOString(),
     }
-    await useMenuStore().fetchMenu(user.value.role)
+    await useMenuStore().fetchMenus(user.value.role)
   }
 
   async function logout() {
