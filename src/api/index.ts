@@ -1,10 +1,12 @@
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
+import { toast } from 'vue-sonner'
 
-// NOTE: useAuthStore를 interceptor 콜백 내부에서 호출하는 이유:
+// NOTE: useAuthStore, useUiStore를 interceptor 콜백 내부에서 호출하는 이유:
 // api/index.ts → stores/auth.ts → api/services/auth.ts → api/index.ts 순환 참조를
 // 모듈 초기화 시점이 아닌 런타임 호출 시점으로 늦춰서 회피합니다.
 import { useAuthStore } from '@/stores/auth'
+import { useUiStore } from '@/stores/ui'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
@@ -19,18 +21,18 @@ const http: AxiosInstance = axios.create({
   },
 })
 
-// Request interceptor: Pinia 스토어에서 토큰 첨부
+// _skipGlobalError 미설정 / false : 공통에서 로딩 시작/종료 + 공통 에러 메시지 처리
+// _skipGlobalError: true           : 업무단에서 직접 처리
+
+// Request interceptor
 http.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // const authStore = useAuthStore()
     // if (authStore.accessToken) {
     //   config.headers.Authorization = `Bearer ${authStore.accessToken}`
     // }
-    console.log('config _skipGlobalError >> ', config._skipGlobalError)
     if (!config._skipGlobalError) {
-      console.log('config _skipGlobalError false >> ', config._skipGlobalError)
-    } else {
-      console.log('config _skipGlobalError true >> ', config._skipGlobalError)
+      useUiStore().startLoading()
     }
     return config
   },
@@ -40,10 +42,15 @@ http.interceptors.request.use(
 // Response interceptor: 비즈니스 코드 검사 + 공통 에러 처리
 http.interceptors.response.use(
   (response) => {
+    if (!response.config._skipGlobalError) {
+      useUiStore().stopLoading()
+    }
     const apiResponse = response.data
-    // HTTP 200이지만 비즈니스 실패인 경우 처리
-    // RES_COM.tranState === 'Y' 성공
+    // HTTP 200이지만 비즈니스 실패인 경우
     if (apiResponse.RES_COM?.tranState !== undefined && apiResponse.RES_COM.tranState !== 'Y') {
+      if (!response.config._skipGlobalError) {
+        toast.error(apiResponse.RES_ERR?.errorMsg ?? '오류가 발생했습니다.')
+      }
       return Promise.reject(apiResponse.RES_ERR)
     }
     return response
@@ -52,53 +59,58 @@ http.interceptors.response.use(
     if (error.response) {
       const status = error.response?.status
       const originalRequest = error.config
-      console.log('originalRequest >> ', originalRequest)
 
       if (status === 401 && !originalRequest._retry) {
         originalRequest._retry = true
         const authStore = useAuthStore()
 
         try {
-          // await authApi.refresh() // 쿠키 자동 전송
-          await axios.post(`${BASE_URL}/auth/refresh`, {}, {
-            withCredentials: true
-          })
+          await axios.post(`${BASE_URL}/auth/refresh`, {}, { withCredentials: true })
+          // 재시도 요청이 request interceptor를 다시 타므로 stopLoading 호출하지 않음
           return http(originalRequest)
         } catch {
+          if (!originalRequest._skipGlobalError) useUiStore().stopLoading()
           authStore.clearAuth()
           window.location.href = '/login'
           return Promise.reject(error)
         }
       }
 
+      if (!originalRequest?._skipGlobalError) {
+        useUiStore().stopLoading()
+      }
+
       const statusGroup = Math.floor(status / 100) * 100
-      switch(statusGroup) {
+      let rejectedError
+      switch (statusGroup) {
         case 400:
         case 500:
-          return Promise.reject({ // 실제 error.response.data.RES_ERR 객체 들어옴
-            // RES_ERR: {
-            //   errorCode: '400500',
-            //   errorMsg: '400500에러',
-            //   errorAddMsg: '400500에러 발생',
-            // }
+          rejectedError = {
             errorCode: '400500',
             errorMsg: '400500에러',
             errorAddMsg: '400500에러 발생',
-          })
+          }
+          break
         default:
-          return Promise.reject(error.response.data.RES_ERR)
+          rejectedError = error.response.data.RES_ERR
       }
+
+      if (!originalRequest?._skipGlobalError) {
+        toast.error(rejectedError?.errorMsg ?? '오류가 발생했습니다.')
+      }
+
+      return Promise.reject(rejectedError)
     } else {
-      return Promise.reject({
-        // RES_ERR: {
-        //   errorCode: '!400500',
-        //   errorMsg: '!400500에러 알 수 없는 오류가 발생했습니다.',
-        //   errorAddMsg: '!400500에러 알 수 없는 오류 추가가 발생했습니다.',
-        // }
+      const noResponseError = {
         errorCode: '!400500',
-        errorMsg: '!400500에러 알 수 없는 오류가 발생했습니다.',
-        errorAddMsg: '!400500에러 알 수 없는 오류 추가가 발생했습니다.',
-      })
+        errorMsg: '알 수 없는 오류가 발생했습니다.',
+        errorAddMsg: '알 수 없는 오류가 발생했습니다.',
+      }
+      if (!error.config?._skipGlobalError) {
+        useUiStore().stopLoading()
+        toast.error(noResponseError.errorMsg)
+      }
+      return Promise.reject(noResponseError)
     }
   }
 )

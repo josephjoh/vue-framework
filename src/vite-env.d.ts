@@ -13,7 +13,6 @@ declare module '*.css' {
 }
 
 import 'axios'
-// _retry 타입 선언 추가
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
     _retry?: boolean
