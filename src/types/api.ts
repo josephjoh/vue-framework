@@ -11,7 +11,7 @@ export interface ApiRequest<T> {
 
 export interface ApiResponse<T> {
   RES_COM: {
-    tranState: string   // "Y"또는 "N"
+    tranState: string // "Y"또는 "N"
     tranMsg: string
     serverTimeString: string
   }

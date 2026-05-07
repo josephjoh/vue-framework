@@ -108,9 +108,9 @@
 
   const treeMenus = computed<MenuTree[]>(() => {
     const map = new Map<string, MenuTree>()
-    menuStore.menus.forEach(item => map.set(item.menuId, { ...item }))
+    menuStore.menus.forEach((item) => map.set(item.menuId, { ...item }))
     const roots: MenuTree[] = []
-    menuStore.menus.forEach(item => {
+    menuStore.menus.forEach((item) => {
       if (item.prntMenuId) {
         const parent = map.get(item.prntMenuId)
         if (parent) {

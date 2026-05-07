@@ -36,7 +36,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/pay/num/PAYNUM000B01M.vue'),
         meta: { title: '홈' },
       },
-      ...pubRoutes
+      ...pubRoutes,
     ],
   },
   {
