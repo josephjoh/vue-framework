@@ -5,6 +5,7 @@ export interface MenuItems {
   menuUri: string
   menuDepth: string
   userGbn?: string
+  children?: MenuItems[]
 }
 
 export interface MenuResponse {

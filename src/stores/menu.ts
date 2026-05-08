@@ -7,7 +7,7 @@ export const useMenuStore = defineStore('menu', () => {
   const menus = ref<MenuItems[]>([])
   const isLoading = ref(false)
 
-  async function fetchMenus(role: string) {
+  async function fetchMenus(role?: string) {
     isLoading.value = true
     try {
       const res = await menuApi.getMenus(role)

@@ -6,7 +6,7 @@
       <AppSidebar />
 
       <main class="flex-1 overflow-y-auto">
-        <Transition name="fade">
+        <!-- <Transition name="fade">
           <div
             v-if="uiStore.isLoading"
             class="fixed inset-0 z-40 flex items-center justify-center bg-white/60"
@@ -32,7 +32,7 @@
               />
             </svg>
           </div>
-        </Transition>
+        </Transition> -->
 
         <div class="mx-auto max-w-screen-xl p-6">
           <RouterView />

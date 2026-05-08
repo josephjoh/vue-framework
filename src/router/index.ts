@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
 import { pubRoutes } from './modules/pub'
+import { payRoutes } from './modules/pay'
 
 // const pubFiles = import.meta.glob('@/views/pub/**/*.vue')
 // const pubRoutes: RouteRecordRaw[] = Object.keys(pubFiles).map((filePath) => {
@@ -30,12 +31,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/HomeView.vue'),
         meta: { title: '홈' },
       },
-      {
-        path: '/pay/num/PAYNUM000B01M',
-        name: 'PAYNUM000B01M',
-        component: () => import('@/views/pay/num/PAYNUM000B01M.vue'),
-        meta: { title: '홈' },
-      },
+      ...payRoutes,
       ...pubRoutes,
     ],
   },
