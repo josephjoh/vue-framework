@@ -12,7 +12,7 @@ export const payRoutes: RouteRecordRaw[] = Object.keys(payFiles).map((filePath) 
   const parts = filePath.replace('/src/views/', '').replace('.vue', '').split('/')
   const path = parts.join('/').replace(/\/index$/, '')
   return {
-    path: path,
+    path: 'screen/' + path,
     name: parts.slice(-2).filter((p) => p !== 'index').join('-'),
     component: payFiles[filePath],
     meta: metaOverrides[path] ?? { requiresAuth: false },

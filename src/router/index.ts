@@ -4,20 +4,8 @@ import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
 import { pubRoutes } from './modules/pub'
 import { payRoutes } from './modules/pay'
+import { sampleRoutes } from './modules/sample'
 
-// const pubFiles = import.meta.glob('@/views/pub/**/*.vue')
-// const pubRoutes: RouteRecordRaw[] = Object.keys(pubFiles).map((filePath) => {
-//   const path = filePath.replace('/src/views/', '').replace('.vue', '').replace(/\/index$/, '')
-//   return {
-//     path: path,
-//     name: path.replace(/\//g, '-'),
-//     component: pubFiles[filePath],
-//     meta: {
-//       title: `퍼블 - ${path.split('/').pop()}`,
-//       requiresAuth: false
-//     }
-//   }
-// })
 
 const routes: RouteRecordRaw[] = [
   {
@@ -47,6 +35,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/NotFoundView.vue'),
     meta: { title: '페이지를 찾을 수 없습니다' },
   },
+  ...sampleRoutes,
 ]
 
 const router = createRouter({
