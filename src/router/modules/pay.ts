@@ -1,6 +1,6 @@
 import type { RouteRecordRaw, RouteMeta } from 'vue-router'
 
-const payFiles = import.meta.glob('@/views/pay/**/*.vue')
+const payFiles = import.meta.glob('@/views/pay/**/index.vue')
 
 const metaOverrides: Record<string, RouteMeta> = {
   // 기본값과 다른 화면만 정의
@@ -11,9 +11,12 @@ const metaOverrides: Record<string, RouteMeta> = {
 export const payRoutes: RouteRecordRaw[] = Object.keys(payFiles).map((filePath) => {
   const parts = filePath.replace('/src/views/', '').replace('.vue', '').split('/')
   const path = parts.join('/').replace(/\/index$/, '')
+  const filtered = parts.filter((p) => p !== 'index')
+  const screenIdIdx = filtered.findIndex((p) => /^[A-Z]{2,}/.test(p))
+  const name = (screenIdIdx >= 0 ? filtered.slice(screenIdIdx) : filtered.slice(-1)).join('-')
   return {
     path: 'screen/' + path,
-    name: parts.slice(-2).filter((p) => p !== 'index').join('-'),
+    name,
     component: payFiles[filePath],
     meta: metaOverrides[path] ?? { requiresAuth: false },
   }

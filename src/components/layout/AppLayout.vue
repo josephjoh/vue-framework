@@ -45,12 +45,12 @@
 </template>
 
 <script setup lang="ts">
-  import { useUiStore } from '@/stores/ui'
+  // import { useUiStore } from '@/stores/ui'
   import AppHeader from './AppHeader.vue'
   import AppSidebar from './AppSidebar.vue'
   import AppFooter from './AppFooter.vue'
 
-  const uiStore = useUiStore()
+  // const uiStore = useUiStore()
 </script>
 
 <style scoped>

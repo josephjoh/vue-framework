@@ -1,6 +1,7 @@
 <template>
   <div>
     <h2>Sample Components</h2>
+    <button v-on:click="callApiForList" />
   </div>
 </template>
 
@@ -18,7 +19,7 @@ const callApiForList = () => {
 
 const getList = async () => {
   const serviceId = 'BIZ0010S02'
-  const screenId = 'PAY0101M01'
+  // const screenId = 'PAY0101M01'
   const payload: SampleInfoReq = {
     bizId: 'TESTID00'
   }
