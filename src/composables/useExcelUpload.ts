@@ -5,12 +5,14 @@ import { h } from 'vue'
 
 export type ExcelRow = Record<string, unknown>
 
-export function useExcelUpload() {
+export function useExcelUpload(largeFileThreshold = 5000) {
   const rows = ref<ExcelRow[]>([])
   const columns = ref<ColumnDef<ExcelRow>[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const fileName = ref<string | null>(null)
+  const isLargeFile = ref(false)
+  const rowCount = ref(0)
 
   function buildColumns(headers: string[]): ColumnDef<ExcelRow>[] {
     return headers.map((header) => ({
@@ -27,6 +29,15 @@ export function useExcelUpload() {
 
     const raw = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1 })
     if (!raw.length) return
+
+    rowCount.value = raw.length - 1  // 헤더 제외 데이터 로우 수
+
+    if (rowCount.value > largeFileThreshold) {
+      isLargeFile.value = true
+      return  // 바인딩 skip
+    }
+
+    isLargeFile.value = false
 
     const headers = (raw[0] as unknown[]).map((h) => String(h ?? ''))
     const dataRows = raw.slice(1).map((row) => {
@@ -79,7 +90,9 @@ export function useExcelUpload() {
     columns.value = []
     error.value = null
     fileName.value = null
+    isLargeFile.value = false
+    rowCount.value = 0
   }
 
-  return { rows, columns, isLoading, error, fileName, handleFileChange, reset }
+  return { rows, columns, isLoading, error, fileName, isLargeFile, rowCount, handleFileChange, reset }
 }

@@ -4,6 +4,7 @@
 
     <ExcelGrid
       v-bind="excelGridProps"
+      :large-file-threshold="1"
       @change="onDataChange"
     />
 

@@ -26,6 +26,12 @@
     <!-- 에러 -->
     <p v-if="error" class="text-sm text-destructive">{{ error }}</p>
 
+    <!-- 대용량 경고 -->
+    <p v-if="isLargeFile" class="text-sm text-destructive">
+      데이터가 너무 많습니다 ({{ rowCount.toLocaleString() }}행 / 최대 {{ props.largeFileThreshold.toLocaleString() }}행).
+      파일을 분할해 업로드해주세요.
+    </p>
+
     <!-- 로딩 -->
     <div v-if="isLoading" class="text-sm text-muted-foreground">파일을 읽는 중...</div>
 
@@ -85,18 +91,20 @@ const props = withDefaults(defineProps<{
   emptyText?: string
   emptyHeight?: string
   showSummary?: boolean
+  largeFileThreshold?: number
 }>(), {
   uploadLabel: 'Excel 파일 선택',
   emptyText: '엑셀 파일을 업로드하면 여기에 데이터가 표시됩니다.',
   emptyHeight: '10rem',
   showSummary: true,
+  largeFileThreshold: 5000,
 })
 
 const emit = defineEmits<{
   change: [rows: ExcelRow[]]
 }>()
 
-const { rows, columns, isLoading, error, fileName, handleFileChange, reset } = useExcelUpload()
+const { rows, columns, isLoading, error, fileName, isLargeFile, rowCount, handleFileChange, reset } = useExcelUpload(props.largeFileThreshold)
 
 const table = useVueTable({
   get data() { return rows.value },
