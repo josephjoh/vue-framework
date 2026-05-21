@@ -58,7 +58,7 @@ const MOCK_MENUS_CHILDREN: MenuItems[] = [
     menuId: 'm1',
     prntMenuId: '',
     menuName: '업무관리',
-    menuUri: '/pay/num/',
+    menuUri: '/screen/pay',
     menuDepth: '1',
     userGbn: '1 2',
     children: [
@@ -66,7 +66,7 @@ const MOCK_MENUS_CHILDREN: MenuItems[] = [
         menuId: 'm1-1',
         prntMenuId: 'm1',
         menuName: '매출관리',
-        menuUri: '/pay/num',
+        menuUri: '/screen/pay/num',
         menuDepth: '2',
         userGbn: '1 2',
         children: [
@@ -74,11 +74,11 @@ const MOCK_MENUS_CHILDREN: MenuItems[] = [
             menuId: 'm1-1-1',
             prntMenuId: 'm1-1',
             menuName: '매출현황',
-            menuUri: '/pay/num',
+            menuUri: '/screen/pay/num/PAYNUM000B01M',
             menuDepth: '3',
             userGbn: '1 2',
           }
-        ]  
+        ]
       }
     ]
   },
@@ -89,5 +89,25 @@ const MOCK_MENUS_CHILDREN: MenuItems[] = [
     menuUri: '',
     menuDepth: '1',
     userGbn: '1 2',
+    children: [
+      {
+        menuId: 'm2-1',
+        prntMenuId: 'm2',
+        menuName: '관리자2',
+        menuUri: '/screen/pay/num',
+        menuDepth: '2',
+        userGbn: '1 2',
+        children: [
+          {
+            menuId: 'm2-1-1',
+            prntMenuId: 'm2-1',
+            menuName: '관리자3',
+            menuUri: '/screen/pay/num/PAYNUM000B01M',
+            menuDepth: '3',
+            userGbn: '1 2',
+          }
+        ]
+      }
+    ]
   },
 ]

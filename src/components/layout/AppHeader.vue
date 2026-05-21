@@ -83,49 +83,160 @@
         <Button variant="secondary" size="sm" @click="handleLogout">로그아웃</Button>
       </div>
     </div>
+
+    <!-- GNB v2 : label/href 바인딩 방식 -->
+    <div class="border-t border-gray-100 bg-gray-50">
+      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+        <nav class="flex items-center gap-1 py-1">
+          <div
+            v-for="(item, i) in gnbItems2"
+            :key="i"
+            class="relative"
+            @mouseenter="activeMenu2 = i"
+            @mouseleave="activeMenu2 = null"
+          >
+            <button
+              class="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-white hover:text-primary-600"
+            >
+              {{ item.label }}
+            </button>
+
+            <div
+              v-if="item.children && activeMenu2 === i"
+              class="absolute left-0 top-full z-50 min-w-40 rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+            >
+              <div
+                v-for="(sub, j) in item.children"
+                :key="j"
+                class="relative"
+                @mouseenter="activeSub2 = `${i}-${j}`"
+                @mouseleave="activeSub2 = null"
+              >
+                <div
+                  class="flex cursor-pointer items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  {{ sub.label }}
+                  <svg
+                    v-if="sub.children"
+                    class="h-4 w-4 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+
+                <div
+                  v-if="sub.children && activeSub2 === `${i}-${j}`"
+                  class="absolute left-full top-0 z-50 min-w-40 rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+                >
+                  <router-link
+                    v-for="(leaf, k) in sub.children"
+                    :key="k"
+                    :to="leaf.href || '/'"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600"
+                  >
+                    {{ leaf.label }}
+                  </router-link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
   </header>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
-  import { useAuthStore } from '@/stores/auth'
-  import { useMenuStore } from '@/stores/menu'
-  import type { MenuItems } from '@/types/menu'
-  import { useRouter } from 'vue-router'
-  import { Button } from '@/components/ui/button'
+import { ref, computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useMenuStore } from '@/stores/menu'
+import type { MenuItems } from '@/types/menu'
+import { useRouter } from 'vue-router'
+import { Button } from '@/components/ui/button'
 
-  interface MenuTree extends MenuItems {
-    children?: MenuTree[]
-  }
+interface MenuTree extends MenuItems {
+  children?: MenuTree[]
+}
 
-  const authStore = useAuthStore()
-  const menuStore = useMenuStore()
-  const router = useRouter()
-  const appName = import.meta.env.VITE_APP_NAME || 'vue-framework'
+interface MenuTree2 extends MenuItems {
+  children?: MenuTree2[]
+}
 
-  const activeMenu = ref<string | null>(null)
-  const activeSub = ref<string | null>(null)
+const authStore = useAuthStore()
+const menuStore = useMenuStore()
+const router = useRouter()
+const appName = import.meta.env.VITE_APP_NAME || 'vue-framework'
 
-  const treeMenus = computed<MenuTree[]>(() => {
-    const map = new Map<string, MenuTree>()
-    menuStore.menus.forEach((item) => map.set(item.menuId, { ...item }))
-    const roots: MenuTree[] = []
-    menuStore.menus.forEach((item) => {
-      if (item.prntMenuId) {
-        const parent = map.get(item.prntMenuId)
-        if (parent) {
-          if (!parent.children) parent.children = []
-          parent.children.push(map.get(item.menuId)!)
-        }
-      } else {
-        roots.push(map.get(item.menuId)!)
+const activeMenu = ref<string | null>(null)
+const activeSub = ref<string | null>(null)
+const activeMenu2 = ref<number | null>(null)
+const activeSub2 = ref<string | null>(null)
+
+const treeMenus = computed<MenuTree[]>(() => {
+  const map = new Map<string, MenuTree>()
+  menuStore.menus.forEach((item) => map.set(item.menuId, { ...item }))
+  const roots: MenuTree[] = []
+  menuStore.menus.forEach((item) => {
+    if (item.prntMenuId) {
+      const parent = map.get(item.prntMenuId)
+      if (parent) {
+        if (!parent.children) parent.children = []
+        parent.children.push(map.get(item.menuId)!)
       }
-    })
-    return roots
+    } else {
+      roots.push(map.get(item.menuId)!)
+    }
   })
+  return roots
+})
 
-  async function handleLogout() {
-    await authStore.logout()
-    router.push({ name: 'Login' })
-  }
+interface GnbLeaf { label: string; href?: string }
+interface GnbSub  { label: string; href?: string; children?: GnbLeaf[] }
+interface GnbItem { label: string; href?: string; children?: GnbSub[] }
+
+const treeMenus2 = computed<MenuTree2[]>(() => {
+  const map = new Map<string, MenuTree2>()
+  menuStore.menus.forEach((item) => map.set(item.menuId, { ...item }))
+  const roots: MenuTree2[] = []
+  menuStore.menus.forEach((item) => {
+    if (item.prntMenuId) {
+      const parent = map.get(item.prntMenuId)
+      if (parent) {
+        if (!parent.children) parent.children = []
+        parent.children.push(map.get(item.menuId)!)
+      }
+    } else {
+      roots.push(map.get(item.menuId)!)
+    }
+  })
+  return roots
+})
+
+const gnbItems2 = computed<GnbItem[]>(() =>
+  treeMenus2.value.map((item) => ({
+    label: item.menuName,
+    href: item.menuUri || undefined,
+    children: item.children?.map((sub) => ({
+      label: sub.menuName,
+      href: sub.menuUri || undefined,
+      children: sub.children?.map((leaf) => ({
+        label: leaf.menuName,
+        href: leaf.menuUri || undefined,
+      })),
+    })),
+  }))
+)
+
+async function handleLogout() {
+  await authStore.logout()
+  router.push({ name: 'Login' })
+}
 </script>
