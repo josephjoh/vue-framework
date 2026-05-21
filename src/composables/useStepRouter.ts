@@ -10,10 +10,14 @@ export function useStepRouter(totalSteps: number) {
     return q >= 1 && q <= totalSteps ? q : 1
   })
 
-  function pushNext() {
-    if (step.value < totalSteps) {
-      router.push({ query: { step: step.value + 1 } })
+  function goStep(n: number) {
+    if (n >= 1 && n <= totalSteps) {
+      router.push({ query: { step: n } })
     }
+  }
+
+  function pushNext() {
+    goStep(step.value + 1)
   }
 
   function goBack() {
@@ -59,7 +63,7 @@ export function useStepRouter(totalSteps: number) {
   onBeforeUnmount(() => window.removeEventListener('popstate', handlePopState))
 
   return {
-    step, pushNext, goBack,
+    step, goStep, pushNext, goBack,
     isPaymentOpen, paymentStep, totalPaymentSteps,
     openPayment, nextPaymentStep, closePayment,
   }
