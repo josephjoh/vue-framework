@@ -16,6 +16,20 @@ export function useStepRouter(totalSteps: number) {
     }
   }
 
+  // 현재 히스토리 항목을 교체 → back 시 이전 라우터 페이지로 이탈
+  function replaceStep(n: number) {
+    if (n >= 1 && n <= totalSteps) {
+      router.replace({ query: { step: n } })
+    }
+  }
+
+  // UI 이전 버튼 전용 — 항상 step-1로 push (히스토리백과 독립)
+  function prevStep() {
+    if (step.value > 1) {
+      router.push({ query: { step: step.value - 1 } })
+    }
+  }
+
   function pushNext() {
     goStep(step.value + 1)
   }
@@ -63,7 +77,7 @@ export function useStepRouter(totalSteps: number) {
   onBeforeUnmount(() => window.removeEventListener('popstate', handlePopState))
 
   return {
-    step, goStep, pushNext, goBack,
+    step, goStep, replaceStep, prevStep, pushNext, goBack,
     isPaymentOpen, paymentStep, totalPaymentSteps,
     openPayment, nextPaymentStep, closePayment,
   }

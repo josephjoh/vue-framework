@@ -33,6 +33,39 @@
         {{ route.fullPath }}
       </div>
 
+      <!-- 임시저장 복원 시나리오 토글 -->
+      <div class="flex items-center gap-3 rounded-lg border border-orange-200 bg-orange-50 p-3">
+        <span class="text-sm text-orange-700">임시저장 복원 시나리오</span>
+        <button
+          @click="hasTempSave = !hasTempSave"
+          class="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
+          :class="hasTempSave ? 'bg-orange-500' : 'bg-gray-300'"
+        >
+          <span
+            class="inline-block h-3 w-3 transform rounded-full bg-white shadow transition-transform"
+            :class="hasTempSave ? 'translate-x-6' : 'translate-x-1'"
+          />
+        </button>
+        <span class="text-xs font-semibold" :class="hasTempSave ? 'text-orange-600' : 'text-gray-400'">
+          {{ hasTempSave ? 'ON' : 'OFF' }}
+        </span>
+      </div>
+
+      <!-- 임시저장 복원 배너 -->
+      <div
+        v-if="hasTempSave && step === 1"
+        class="flex items-center justify-between rounded-lg border border-amber-300 bg-amber-50 px-4 py-3"
+      >
+        <div class="text-sm text-amber-800">
+          <span class="font-semibold">이전 작업 내역 있음</span>
+          <span class="ml-2 text-amber-600">step 3까지 임시저장됨</span>
+        </div>
+        <button
+          @click="handleRestore"
+          class="rounded-md border border-amber-500 bg-white px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-50"
+        >이어서 작업하기 (step 3)</button>
+      </div>
+
       <!-- Step 인디케이터 -->
       <div class="flex items-center gap-2">
         <template v-for="n in 5" :key="n">
@@ -66,8 +99,9 @@
       <!-- 버튼 -->
       <div class="flex justify-between">
         <button
-          @click="goBack"
-          class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          @click="prevStep"
+          :disabled="step === 1"
+          class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
         >← 이전</button>
         <button
           v-if="step < 5"
@@ -316,7 +350,7 @@ function selectScenario(i: number) {
 }
 
 // ── ① URL query step + ② 결제 모달 (popstate는 composable 내부 처리) ──
-const { step, pushNext, goBack, isPaymentOpen, paymentStep, openPayment, nextPaymentStep, closePayment } = useStepRouter(5)
+const { step, pushNext, prevStep, replaceStep, isPaymentOpen, paymentStep, openPayment, nextPaymentStep, closePayment } = useStepRouter(5)
 
 const stepDescs = ['기본 정보 입력', '약관 동의', '결제 수단 선택', '결제 진행', '완료']
 
@@ -324,6 +358,8 @@ interface Log { type: 'info' | 'hook'; msg: string }
 const stepLogs = ref<Log[]>([])
 
 watch(step, (cur, prev) => {
+  console.log('cur >>> ', cur)
+  console.log('prev >>> ', prev)
   if (prev === undefined) {
     stepLogs.value.push({ type: 'hook', msg: `[watch immediate] step = ${cur} (초기 진입 또는 새로고침)` })
   } else {
@@ -335,6 +371,15 @@ watch(step, (cur, prev) => {
 function handleStepNext() {
   stepLogs.value.push({ type: 'info', msg: `> step${step.value} DB 저장 후 다음으로` })
   pushNext()
+}
+
+// 임시저장 복원 시나리오
+const hasTempSave = ref(false)
+
+function handleRestore() {
+  stepLogs.value.push({ type: 'info', msg: '> replaceStep(3) 호출 — 현재 히스토리 항목을 교체' })
+  stepLogs.value.push({ type: 'hook', msg: '[router.replace] 뒤로가기 시 이전 라우터 페이지로 이탈 (step2 아님)' })
+  replaceStep(3)
 }
 
 // ── ② 결제 모달 뒤로가기 ──────────────────────────
