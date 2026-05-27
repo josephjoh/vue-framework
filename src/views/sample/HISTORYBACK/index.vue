@@ -349,8 +349,11 @@ function selectScenario(i: number) {
   if (route.query.step) router.replace({ query: {} })
 }
 
+// 임시저장 복원 시나리오
+const hasTempSave = ref(false)
+
 // ── ① URL query step + ② 결제 모달 (popstate는 composable 내부 처리) ──
-const { step, pushNext, prevStep, replaceStep, isPaymentOpen, paymentStep, openPayment, nextPaymentStep, closePayment } = useStepRouter(5)
+const { step, goStep, pushNext, prevStep, isPaymentOpen, paymentStep, openPayment, nextPaymentStep, closePayment } = useStepRouter(5)
 
 const stepDescs = ['기본 정보 입력', '약관 동의', '결제 수단 선택', '결제 진행', '완료']
 
@@ -373,13 +376,10 @@ function handleStepNext() {
   pushNext()
 }
 
-// 임시저장 복원 시나리오
-const hasTempSave = ref(false)
-
 function handleRestore() {
-  stepLogs.value.push({ type: 'info', msg: '> replaceStep(3) 호출 — 현재 히스토리 항목을 교체' })
-  stepLogs.value.push({ type: 'hook', msg: '[router.replace] 뒤로가기 시 이전 라우터 페이지로 이탈 (step2 아님)' })
-  replaceStep(3)
+  stepLogs.value.push({ type: 'info', msg: '> goStep(3) 호출 — step1 히스토리 유지하며 step3 push' })
+  stepLogs.value.push({ type: 'hook', msg: '[router.push] 히스토리: [PrevPage, step1, step3] → 뒤로가기 시 step1 이동' })
+  goStep(3)
 }
 
 // ── ② 결제 모달 뒤로가기 ──────────────────────────

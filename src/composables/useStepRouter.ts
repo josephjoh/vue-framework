@@ -34,10 +34,6 @@ export function useStepRouter(totalSteps: number) {
     goStep(step.value + 1)
   }
 
-  function goBack() {
-    router.go(-1)
-  }
-
   // ── 결제 모달 popstate 처리 ──────────────────────
   const isPaymentOpen = ref(false)
   const paymentStep = ref(1)
@@ -73,11 +69,16 @@ export function useStepRouter(totalSteps: number) {
     }
   }
 
-  onMounted(() => window.addEventListener('popstate', handlePopState))
+  onMounted(() => {
+    // if (!route.query.step) {
+    //   router.replace({ query: { step: 1 } })
+    // }
+    window.addEventListener('popstate', handlePopState)
+  })
   onBeforeUnmount(() => window.removeEventListener('popstate', handlePopState))
 
   return {
-    step, goStep, replaceStep, prevStep, pushNext, goBack,
+    step, goStep, replaceStep, prevStep, pushNext,
     isPaymentOpen, paymentStep, totalPaymentSteps,
     openPayment, nextPaymentStep, closePayment,
   }
