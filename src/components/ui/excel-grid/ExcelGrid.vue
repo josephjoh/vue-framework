@@ -71,6 +71,7 @@
           </TableRow>
         </TableBody>
       </Table>
+      <!-- <Table :columns="tableCols" :row="tableData" caption="납세번호" /> -->
     </template>
   </div>
 </template>
@@ -121,6 +122,26 @@ function onFileChange(event: Event) {
 function onReset() {
   reset()
 }
+
+// const tableCols [
+//   { key: 'keynum', lable: '기관번호' },
+//   { key: 'desc', lable: '세목' },
+//   { key: 'date', lable: '납기년월' },
+//   { key: 'taxnum', lable: '과세번호' }
+// ]
+// const tableData = [
+//   { keynum: '000000', desc: '1010234', date: '2025-01-01', taxnum: '000019' }
+// ]
+
+// const tableCols = computed(() =>
+//   columns.value.map(col => ({
+//     key: (col as { accessorKey: string }).accessorKey,
+//     label: (col as { accessorKey: string }).accessorKey
+//   }))
+// )
+
+// const tableData = computed(() => rows.value)
+
 
 defineExpose({ rows, columns, reset })
 </script>
