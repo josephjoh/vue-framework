@@ -1,12 +1,12 @@
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
-import { toast } from 'vue-sonner'
 
-// NOTE: useAuthStore, useUiStore를 interceptor 콜백 내부에서 호출하는 이유:
+// NOTE: useAuthStore, useUiStore, useErrorPopupStore를 interceptor 콜백 내부에서 호출하는 이유:
 // api/index.ts → stores/auth.ts → api/services/auth.ts → api/index.ts 순환 참조를
 // 모듈 초기화 시점이 아닌 런타임 호출 시점으로 늦춰서 회피합니다.
 import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
+import { useErrorPopupStore } from '@/stores/errorPopup'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
@@ -49,7 +49,7 @@ http.interceptors.response.use(
     // HTTP 200이지만 비즈니스 실패인 경우
     if (apiResponse.RES_COM?.tranState !== undefined && apiResponse.RES_COM.tranState !== 'Y') {
       if (!response.config._skipGlobalError) {
-        toast.error(apiResponse.RES_ERR?.errorMsg ?? '오류가 발생했습니다.')
+        useErrorPopupStore().show(apiResponse.RES_ERR?.errorMsg ?? '오류가 발생했습니다.')
       }
       return Promise.reject(apiResponse.RES_ERR)
     }
@@ -96,7 +96,7 @@ http.interceptors.response.use(
       }
 
       if (!originalRequest?._skipGlobalError) {
-        toast.error(rejectedError?.errorMsg ?? '오류가 발생했습니다.')
+        useErrorPopupStore().show(rejectedError?.errorMsg ?? '오류가 발생했습니다.')
       }
 
       return Promise.reject(rejectedError)
@@ -108,7 +108,7 @@ http.interceptors.response.use(
       }
       if (!error.config?._skipGlobalError) {
         useUiStore().stopLoading()
-        toast.error(noResponseError.errorMsg)
+        useErrorPopupStore().show(noResponseError.errorMsg)
       }
       return Promise.reject(noResponseError)
     }
