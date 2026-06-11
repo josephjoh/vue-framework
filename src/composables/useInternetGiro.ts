@@ -5,9 +5,9 @@ import type { InternetGiroRequest, InternetGiroParams } from '@/types/InternetGi
 
 const GIRO_BASE = 'https://giro.or.kr'
 
-const BACKEND_API = {
-  giro: '/api/giro/params', // TODO: 실제 백엔드 경로로 교체
-}
+// const BACKEND_API = {
+//   giro: '/api/giro/params', // TODO: 실제 백엔드 경로로 교체
+// }
 
 // ─── 구현 ────────────────────────────────────────────────────────────────────
 

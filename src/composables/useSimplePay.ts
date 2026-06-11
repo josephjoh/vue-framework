@@ -3,7 +3,7 @@ import type { SimplePayMethod, SimplePayParams } from '@/types/SimplePay'
 
 export type { SimplePayMethod, SimplePayParams }
 
-const SEOUL_BASE = 'https://tetax2.seoul.go.kr'
+// const SEOUL_BASE = 'https://tetax2.seoul.go.kr'
 
 // TODO: 실제 연동 시 post() 호출로 교체, 아래 mock 맵 제거
 const MOCK_URLS: Record<SimplePayMethod, string> = {
