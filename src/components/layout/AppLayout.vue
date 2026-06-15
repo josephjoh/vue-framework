@@ -42,15 +42,36 @@
 
     <AppFooter />
   </div>
+
+  <TimeoutDialog />
+  <ErrorPopupDialog />
 </template>
 
 <script setup lang="ts">
+  import { watch, onUnmounted } from 'vue'
   // import { useUiStore } from '@/stores/ui'
   import AppHeader from './AppHeader.vue'
   import AppSidebar from './AppSidebar.vue'
   import AppFooter from './AppFooter.vue'
+  import TimeoutDialog from '@/components/TimeoutDialog.vue'
+  import ErrorPopupDialog from '@/components/ErrorPopupDialog.vue'
+  import { useAuthStore } from '@/stores/auth'
+  import { useSessionTimeout } from '@/composables/useTimeout.ts'
 
   // const uiStore = useUiStore()
+
+  const authStore = useAuthStore()
+  const { startTracking, stopTracking } = useSessionTimeout()
+
+  watch(
+    () => authStore.isAuthenticated,
+    (authenticated) => {
+      authenticated ? startTracking() : stopTracking()
+    },
+    { immediate: true }
+  )
+
+  onUnmounted(() => stopTracking())
 </script>
 
 <style scoped>
