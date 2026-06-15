@@ -6,5 +6,9 @@ declare module 'vue-router' {
     guestOnly?: boolean
     title?: string
     allowedRoles?: string[]
+    nativeScreen?: {
+      screenId: string
+      payload?: Record<string, unknown>
+    }
   }
 }

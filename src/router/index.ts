@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
+import { useNativeBridge } from '@/composables/useNativeBridge'
 import { pubRoutes } from './modules/pub'
 import { payRoutes } from './modules/pay'
 import { sampleRoutes } from './modules/sample'
@@ -49,6 +50,16 @@ const router = createRouter({
 
 // Navigation guard
 router.beforeEach(async (to) => {
+  // 네이티브 화면 분기 — WebView 내비게이션 취소
+  if (to.meta.nativeScreen) {
+    const { postMessage } = useNativeBridge()
+    postMessage('OPEN_NATIVE_SCREEN', {
+      screenId: to.meta.nativeScreen.screenId,
+      ...to.meta.nativeScreen.payload,
+    })
+    return false
+  }
+
   const authStore = useAuthStore()
   const menuStore = useMenuStore()
 

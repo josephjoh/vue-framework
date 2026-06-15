@@ -6,6 +6,7 @@ export type BridgeAction =
   | 'GET_LOCATION'
   | 'LOCATION_RESULT'
   | 'PAY_RESULT'
+  | 'OPEN_NATIVE_SCREEN'
 
 export interface BridgeMessage<T = unknown> {
   action: BridgeAction
