@@ -7,10 +7,29 @@ export type BridgeAction =
   | 'LOCATION_RESULT'
   | 'PAY_RESULT'
   | 'OPEN_NATIVE_SCREEN'
+  | 'API_CALL'
+  | 'API_RESPONSE'
 
 export interface BridgeMessage<T = unknown> {
   action: BridgeAction
   payload?: T
+}
+
+type MessageHandler = (payload: unknown) => void
+
+// action별 핸들러를 관리하는 중앙 멀티플렉서
+const handlers = new Map<BridgeAction, MessageHandler>()
+
+function initMultiplexer() {
+  if (window.onNativeMessage) return
+  window.onNativeMessage = (jsonStr: string) => {
+    try {
+      const { action, payload } = JSON.parse(jsonStr) as BridgeMessage
+      handlers.get(action)?.(payload)
+    } catch {
+      console.error('[NativeBridge] onMessage parse error:', jsonStr)
+    }
+  }
 }
 
 export function useNativeBridge() {
@@ -25,24 +44,17 @@ export function useNativeBridge() {
     } else if (isAndroid()) {
       window.AndroidBridge!.postMessage(data)
     } else {
-      // 브라우저 개발 환경 — 메시지만 출력
       console.log('[NativeBridge] postMessage (dev):', { action, payload })
     }
   }
 
-  function onMessage<T = unknown>(callback: (action: BridgeAction, payload: T) => void) {
-    window.onNativeMessage = (jsonStr: string) => {
-      try {
-        const { action, payload } = JSON.parse(jsonStr) as BridgeMessage<T>
-        callback(action, payload as T)
-      } catch {
-        console.error('[NativeBridge] onMessage parse error:', jsonStr)
-      }
-    }
+  function onMessage<T = unknown>(action: BridgeAction, callback: (payload: T) => void) {
+    initMultiplexer()
+    handlers.set(action, callback as MessageHandler)
   }
 
-  function removeListener() {
-    delete window.onNativeMessage
+  function removeListener(action: BridgeAction) {
+    handlers.delete(action)
   }
 
   return { postMessage, onMessage, removeListener, isIos, isAndroid }

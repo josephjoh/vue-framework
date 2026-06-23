@@ -108,20 +108,23 @@ function simulate(action: BridgeAction, payload: unknown) {
 }
 
 onMounted(() => {
-  onMessage((action, payload: unknown) => {
-    addLog(action, payload)
-
-    if (action === 'BIOMETRIC_RESULT') {
-      biometricResult.value = payload as { success: boolean; reason?: string }
-    } else if (action === 'CAMERA_RESULT') {
-      cameraImageUrl.value = (payload as { imageUrl: string }).imageUrl
-    } else if (action === 'LOCATION_RESULT') {
-      location.value = payload as { lat: number; lng: number }
-    }
+  onMessage('BIOMETRIC_RESULT', (payload: unknown) => {
+    addLog('BIOMETRIC_RESULT', payload)
+    biometricResult.value = payload as { success: boolean; reason?: string }
+  })
+  onMessage('CAMERA_RESULT', (payload: unknown) => {
+    addLog('CAMERA_RESULT', payload)
+    cameraImageUrl.value = (payload as { imageUrl: string }).imageUrl
+  })
+  onMessage('LOCATION_RESULT', (payload: unknown) => {
+    addLog('LOCATION_RESULT', payload)
+    location.value = payload as { lat: number; lng: number }
   })
 })
 
 onUnmounted(() => {
-  removeListener()
+  removeListener('BIOMETRIC_RESULT')
+  removeListener('CAMERA_RESULT')
+  removeListener('LOCATION_RESULT')
 })
 </script>
