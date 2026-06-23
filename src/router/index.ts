@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useMenuStore } from '@/stores/menu'
 import { useNativeBridge } from '@/composables/useNativeBridge'
 import { pubRoutes } from './modules/pub'
 import { payRoutes } from './modules/pay'
@@ -29,6 +28,12 @@ const routes: RouteRecordRaw[] = [
     name: 'Login',
     component: () => import('@/views/LoginView.vue'),
     meta: { title: '로그인', guestOnly: true },
+  },
+  {
+    path: '/member/cert',
+    name: 'MemberCert',
+    component: () => import('@/views/MemberCertView.vue'),
+    meta: { title: '정회원 인증', requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -61,7 +66,6 @@ router.beforeEach(async (to) => {
   }
 
   const authStore = useAuthStore()
-  const menuStore = useMenuStore()
 
   // 페이지 타이틀 설정
   document.title = to.meta.title
@@ -73,10 +77,16 @@ router.beforeEach(async (to) => {
     return { name: 'Login', query: { redirect: to.fullPath } }
   }
 
-  // 메뉴 미로드 시 fetch (새로고침 대비 — AppLayout onMounted보다 먼저 실행됨)
-  if (to.name !== 'Login' && to.name !== 'NotFound' && menuStore.menus.length === 0) {
-    await menuStore.fetchMenus(authStore.userRole)
+  // 정회원 전용 페이지 → 준회원이면 인증 화면으로
+  if (to.meta.requiresFullMember && authStore.user?.memberType === 'SEMI') {
+    return { name: 'MemberCert', query: { redirect: to.fullPath } }
   }
+
+  // 정회원이 인증 화면 직접 접근 시 홈으로
+  if (to.name === 'MemberCert' && authStore.user?.memberType === 'FULL') {
+    return { name: 'Home' }
+  }
+
 })
 
 export default router

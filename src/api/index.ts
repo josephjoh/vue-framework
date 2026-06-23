@@ -4,7 +4,7 @@ import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 // NOTE: useAuthStore, useUiStore, useErrorPopupStore를 interceptor 콜백 내부에서 호출하는 이유:
 // api/index.ts → stores/auth.ts → api/services/auth.ts → api/index.ts 순환 참조를
 // 모듈 초기화 시점이 아닌 런타임 호출 시점으로 늦춰서 회피합니다.
-import { useAuthStore } from '@/stores/auth'
+// import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import { useErrorPopupStore } from '@/stores/errorPopup'
 
@@ -60,21 +60,21 @@ http.interceptors.response.use(
       const status = error.response?.status
       const originalRequest = error.config
 
-      if (status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true
-        const authStore = useAuthStore()
-
-        try {
-          await axios.post(`${BASE_URL}/auth/refresh`, {}, { withCredentials: true })
-          // 재시도 요청이 request interceptor를 다시 타므로 stopLoading 호출하지 않음
-          return http(originalRequest)
-        } catch {
-          if (!originalRequest._skipGlobalError) useUiStore().stopLoading()
-          authStore.clearAuth()
-          window.location.href = '/login'
-          return Promise.reject(error)
-        }
-      }
+      // if (status === 401 && !originalRequest._retry) {
+      //   originalRequest._retry = true
+      //   const authStore = useAuthStore()
+      //
+      //   try {
+      //     await axios.post(`${BASE_URL}/auth/refresh`, {}, { withCredentials: true })
+      //     // 재시도 요청이 request interceptor를 다시 타므로 stopLoading 호출하지 않음
+      //     return http(originalRequest)
+      //   } catch {
+      //     if (!originalRequest._skipGlobalError) useUiStore().stopLoading()
+      //     authStore.clearAuth()
+      //     window.location.href = '/login'
+      //     return Promise.reject(error)
+      //   }
+      // }
 
       if (!originalRequest?._skipGlobalError) {
         useUiStore().stopLoading()

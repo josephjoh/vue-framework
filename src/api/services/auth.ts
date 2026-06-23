@@ -1,9 +1,28 @@
-import { get, post } from '@/api/request'
-import type { LoginRequest, LoginResponse } from '@/types'
+import { post } from '@/api/request'
+import type { LoginRequest, LoginResponse, ApiError } from '@/types'
+import { useServiceApi } from '@/composables/useServiceApi'
+
+const { callPostApi } = useServiceApi()
 
 export const authApi = {
-  login(payload: LoginRequest) {
-    return post<LoginResponse>('/service/auth/login', payload)
+  login: async (payload: LoginRequest) => {
+    try {
+      const serviceId = ''
+      payload = {
+        email: 'as',
+        password: 'ss',
+      }
+
+      const result = await callPostApi<LoginRequest, LoginResponse>(
+        serviceId,
+        payload
+      )
+      // return post<LoginResponse>('/service/auth/login', payload)
+      return result
+    } catch (e: unknown) {
+      const err = e as ApiError
+      console.log('err >>> ', err.errorCode)
+    }
   },
 
   logout() {
@@ -11,13 +30,13 @@ export const authApi = {
     return post<null>('/auth/logout')
   },
 
-  refresh() {
-    // 쿠키 갱신
-    return post<void>('/auth/refresh')
-  },
+  // refresh() {
+  //   // 쿠키 갱신
+  //   return post<void>('/auth/refresh')
+  // },
 
-  me() {
-    // 쿠키 유효성 확인 + user 정보 복원
-    return get<LoginResponse['user']>('/auth/me')
+  upgradeMembership() {
+    // 준회원 → 정회원 전환
+    return post<void>('/auth/membership/upgrade')
   },
 }
