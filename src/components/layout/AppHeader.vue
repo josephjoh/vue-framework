@@ -79,7 +79,7 @@
 
       <!-- User area -->
       <div class="flex items-center gap-4">
-        <span class="text-sm text-gray-600">{{ authStore.user?.name }}</span>
+        <span class="text-sm text-gray-600">{{ user?.name }}</span>
         <Button variant="secondary" size="sm" @click="handleLogout">로그아웃</Button>
       </div>
     </div>
@@ -156,10 +156,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuth } from '@/composables/useAuth'
 import { useMenuStore } from '@/stores/menu'
 import type { MenuItems } from '@/types/menu'
-import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 
 interface MenuTree extends MenuItems {
@@ -170,9 +169,8 @@ interface MenuTree2 extends MenuItems {
   children?: MenuTree2[]
 }
 
-const authStore = useAuthStore()
+const { user, logout } = useAuth()
 const menuStore = useMenuStore()
-const router = useRouter()
 const appName = import.meta.env.VITE_APP_NAME || 'vue-framework'
 
 const activeMenu = ref<string | null>(null)
@@ -236,7 +234,6 @@ const gnbItems2 = computed<GnbItem[]>(() =>
 )
 
 async function handleLogout() {
-  await authStore.logout()
-  router.push({ name: 'Login' })
+  await logout()
 }
 </script>

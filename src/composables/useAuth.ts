@@ -20,10 +20,8 @@ export function useAuth() {
     const redirect = router.currentRoute.value.query.redirect as string | undefined
 
     if (authStore.user?.memberType === 'SEMI') {
-      // 준회원: 정회원 인증 화면으로 이동 (원래 경로 보존)
       router.push({ name: 'MemberCert', query: { redirect: redirect ?? '/' } })
     } else {
-      // 정회원: 원래 가려던 특정 페이지로 이동
       router.push(redirect ?? { name: 'Home' })
     }
   }
@@ -31,6 +29,16 @@ export function useAuth() {
   async function logout() {
     await authStore.logout()
     router.push({ name: 'Login' })
+  }
+
+  async function upgradeMembership() {
+    await authStore.upgradeMembership()
+    const redirect = router.currentRoute.value.query.redirect as string | undefined
+    router.push(redirect ?? { name: 'Home' })
+  }
+
+  async function initAuth() {
+    await authStore.initAuth()
   }
 
   return {
@@ -42,5 +50,7 @@ export function useAuth() {
     isFullMember,
     login,
     logout,
+    upgradeMembership,
+    initAuth,
   }
 }

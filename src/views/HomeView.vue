@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">
-        안녕하세요, {{ authStore.user?.name ?? '사용자' }}님!
+        안녕하세요, {{ user?.name ?? '사용자' }}님!
       </h1>
       <p class="mt-1 text-sm text-gray-500">
         Vue Framework 공통 프레임워크에 오신 것을 환영합니다.
@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { useAuthStore } from '@/stores/auth'
+  import { useAuth } from '@/composables/useAuth'
   import { useToast } from '@/composables/useToast'
   import { Button } from '@/components/ui/button'
   import {
@@ -59,7 +59,7 @@
     DialogTitle,
   } from '@/components/ui/dialog'
 
-  const authStore = useAuthStore()
+  const { user } = useAuth()
   const toast = useToast()
   const showModal = ref(false)
 

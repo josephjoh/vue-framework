@@ -71,18 +71,12 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
-import { useRouter } from 'vue-router'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
-const { logout } = useAuth()
+const { logout, upgradeMembership } = useAuth()
 const toast = useToast()
 
 const form = reactive({ phone: '', certCode: '' })
@@ -137,11 +131,8 @@ async function handleCert() {
 
   isLoading.value = true
   try {
-    await authStore.upgradeMembership()
+    await upgradeMembership()
     toast.success('정회원 인증이 완료되었습니다.')
-
-    const redirect = route.query.redirect as string | undefined
-    router.push(redirect ?? { name: 'Home' })
   } catch {
     toast.error('인증에 실패했습니다. 다시 시도해주세요.')
   } finally {

@@ -55,16 +55,16 @@
   import AppFooter from './AppFooter.vue'
   import TimeoutDialog from '@/components/TimeoutDialog.vue'
   import ErrorPopupDialog from '@/components/ErrorPopupDialog.vue'
-  import { useAuthStore } from '@/stores/auth'
+  import { useAuth } from '@/composables/useAuth'
   import { useSessionTimeout } from '@/composables/useTimeout.ts'
 
   // const uiStore = useUiStore()
 
-  const authStore = useAuthStore()
+  const { isAuthenticated } = useAuth()
   const { startTracking, stopTracking } = useSessionTimeout()
 
   watch(
-    () => authStore.isAuthenticated,
+    isAuthenticated,
     (authenticated) => {
       authenticated ? startTracking() : stopTracking()
     },
