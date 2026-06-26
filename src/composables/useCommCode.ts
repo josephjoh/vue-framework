@@ -1,22 +1,22 @@
 import { ref } from 'vue'
-import { useCommonCodeStore } from '@/stores/commonCode'
+import { useCommCodeStore } from '@/stores/commCode'
 import { useServiceApi } from '@/composables/useServiceApi'
-import type { CommonCodeItem, CommonCodeRequest, CommonCodeResponse } from '@/types'
+import type { CommCodeItem, CommCodeRequest, CommCodeResponse } from '@/types'
 
 // 동일 groupCd 동시 요청 시 API 중복 호출 방지
-const pending = new Map<string, Promise<CommonCodeItem[]>>()
+const pending = new Map<string, Promise<CommCodeItem[]>>()
 
-export function useCommonCode() {
-  const store = useCommonCodeStore()
+export function useCommCode() {
+  const store = useCommCodeStore()
   const { callPostApi } = useServiceApi()
 
-  async function load(groupCd: string): Promise<CommonCodeItem[]> {
+  async function load(groupCd: string): Promise<CommCodeItem[]> {
     if (store.has(groupCd)) return store.get(groupCd)
 
     if (!pending.has(groupCd)) {
       const promise = (async () => {
         try {
-          const res = await callPostApi<CommonCodeRequest, CommonCodeResponse>(
+          const res = await callPostApi<CommCodeRequest, CommCodeResponse>(
             'COMMON_CODE_INQUIRY',
             { groupCd },
           )
@@ -35,7 +35,7 @@ export function useCommonCode() {
   }
 
   function useCodeGroup(groupCd: string) {
-    const items = ref<CommonCodeItem[]>(store.get(groupCd))
+    const items = ref<CommCodeItem[]>(store.get(groupCd))
     const isLoading = ref(false)
 
     async function fetch() {
