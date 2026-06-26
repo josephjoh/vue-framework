@@ -79,8 +79,13 @@
 
       <!-- User area -->
       <div class="flex items-center gap-4">
-        <span class="text-sm text-gray-600">{{ user?.name }}</span>
-        <Button variant="secondary" size="sm" @click="handleLogout">로그아웃</Button>
+        <template v-if="isAuthenticated">
+          <span class="text-sm text-gray-600">{{ user?.name }}님, 안녕하세요.</span>
+          <Button variant="secondary" size="sm" @click="handleLogout">로그아웃</Button>
+        </template>
+        <template v-else>
+          <Button variant="default" size="sm" @click="$router.push({ name: 'Login' })">로그인</Button>
+        </template>
       </div>
     </div>
 
@@ -169,7 +174,7 @@ interface MenuTree2 extends MenuItems {
   children?: MenuTree2[]
 }
 
-const { user, logout } = useAuth()
+const { user, isAuthenticated, logout } = useAuth()
 const menuStore = useMenuStore()
 const appName = import.meta.env.VITE_APP_NAME || 'vue-framework'
 
