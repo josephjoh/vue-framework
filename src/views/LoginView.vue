@@ -8,29 +8,29 @@
 
       <form class="space-y-5" @submit.prevent="handleLogin">
         <div class="space-y-1">
-          <label class="text-sm font-medium text-gray-700" for="email">이메일</label>
+          <label class="text-sm font-medium text-gray-700" for="napId">napId</label>
           <Input
-            id="email"
-            v-model="form.email"
-            type="email"
-            placeholder="example@email.com"
-            :aria-invalid="!!errors.email"
+            id="napId"
+            v-model="form.napId"
+            type="text"
+            placeholder="napId를 입력하세요"
+            :aria-invalid="!!errors.napId"
             required
           />
-          <p v-if="errors.email" class="text-sm text-destructive">{{ errors.email }}</p>
+          <p v-if="errors.napId" class="text-sm text-destructive">{{ errors.napId }}</p>
         </div>
 
         <div class="space-y-1">
-          <label class="text-sm font-medium text-gray-700" for="password">비밀번호</label>
+          <label class="text-sm font-medium text-gray-700" for="napNm">napNm</label>
           <Input
-            id="password"
-            v-model="form.password"
-            type="password"
-            placeholder="비밀번호를 입력하세요"
-            :aria-invalid="!!errors.password"
+            id="napNm"
+            v-model="form.napNm"
+            type="text"
+            placeholder="napNm을 입력하세요"
+            :aria-invalid="!!errors.napNm"
             required
           />
-          <p v-if="errors.password" class="text-sm text-destructive">{{ errors.password }}</p>
+          <p v-if="errors.napNm" class="text-sm text-destructive">{{ errors.napNm }}</p>
         </div>
 
         <Button type="submit" class="w-full" :disabled="isLoading">
@@ -45,30 +45,27 @@
   import { reactive, ref } from 'vue'
   import { useAuth } from '@/composables/useAuth'
   import { useToast } from '@/composables/useToast'
-  import { isEmail, isRequired } from '@/utils/validators'
+  import { isRequired } from '@/utils/validators'
   import { Input } from '@/components/ui/input'
   import { Button } from '@/components/ui/button'
+  import type { LoginRequest } from '@/types'
 
   const { login } = useAuth()
   const toast = useToast()
 
-  const form = reactive({ email: '', password: '' })
-  const errors = reactive({ email: '', password: '' })
+  const form = reactive<LoginRequest>({ napId: '', napNm: '' })
+  const errors = reactive<LoginRequest>({ napId: '', napNm: '' })
   const isLoading = ref(false)
 
   function validate(): boolean {
-    errors.email = ''
-    errors.password = ''
-    if (!isRequired(form.email)) {
-      errors.email = '이메일을 입력해주세요.'
+    errors.napId = ''
+    errors.napNm = ''
+    if (!isRequired(form.napId)) {
+      errors.napId = 'napId를 입력해주세요.'
       return false
     }
-    if (!isEmail(form.email)) {
-      errors.email = '올바른 이메일 형식을 입력해주세요.'
-      return false
-    }
-    if (!isRequired(form.password)) {
-      errors.password = '비밀번호를 입력해주세요.'
+    if (!isRequired(form.napNm)) {
+      errors.napNm = 'napNm을 입력해주세요.'
       return false
     }
     return true
@@ -78,7 +75,7 @@
     if (!validate()) return
     isLoading.value = true
     try {
-      await login({ email: form.email, password: form.password })
+      await login({ ...form })
     } catch (e) {
       toast.error(e instanceof Error ? e.message : '로그인에 실패했습니다.')
     } finally {

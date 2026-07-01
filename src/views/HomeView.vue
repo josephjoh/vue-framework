@@ -18,6 +18,7 @@
         <Button variant="secondary" @click="toast.warning('경고 메시지입니다!')">경고 Toast</Button>
         <Button variant="ghost" @click="toast.info('안내 메시지입니다.')">정보 Toast</Button>
         <Button variant="secondary" @click="showModal = true">모달 열기</Button>
+        <Button @click="handleLogin">로그인 테스트</Button>
       </div>
     </div>
 
@@ -59,9 +60,17 @@
     DialogTitle,
   } from '@/components/ui/dialog'
 
-  const { user } = useAuth()
+  const { user, login } = useAuth()
   const toast = useToast()
   const showModal = ref(false)
 
   console.log('base_url >> ', import.meta.env.VITE_API_BASE_URL)
+
+  async function handleLogin() {
+    try {
+      await login({ napId: 'test', napNm: 'test' })
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '로그인에 실패했습니다.')
+    }
+  }
 </script>

@@ -1,6 +1,6 @@
-import { useRoute } from 'vue-router'
 import { post } from '@/api/request'
 import { useNativeBridge } from '@/composables/useNativeBridge'
+import router from '@/router'
 import type { ApiRequest, ApiResponse } from '@/types'
 import type { AxiosRequestConfig } from 'axios'
 
@@ -17,7 +17,6 @@ const pendingRequests = new Map<string, {
 }>()
 
 export const useServiceApi = () => {
-  const route = useRoute()
   const { postMessage, onMessage, isIos, isAndroid } = useNativeBridge()
 
   const isNative = () => isIos() || isAndroid()
@@ -39,7 +38,7 @@ export const useServiceApi = () => {
     payload: TReq,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<TRes>> => {
-    const screenId = route.path.split('/').pop() || 'index'
+    const screenId = router.currentRoute.value.path.split('/').pop() || 'index'
     const postData: ApiRequest<TReq> = {
       REQ_COM: {
         serviceId,

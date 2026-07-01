@@ -19,8 +19,8 @@ export interface User {
 }
 
 export interface LoginRequest {
-  email: string
-  password: string
+  napId: string
+  napNm: string
 }
 
 export interface LoginResponse {

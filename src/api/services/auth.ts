@@ -9,8 +9,8 @@ export const authApi = {
     try {
       const serviceId = ''
       payload = {
-        email: 'as',
-        password: 'ss',
+        napId: 'as',
+        napNm: 'ss',
       }
 
       const result = await callPostApi<LoginRequest, LoginResponse>(
