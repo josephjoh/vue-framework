@@ -5,6 +5,7 @@ import { useNativeBridge } from '@/composables/useNativeBridge'
 import { pubRoutes } from './modules/pub'
 import { payRoutes } from './modules/pay'
 import { sampleRoutes } from './modules/sample'
+import { manRoutes } from './modules/man'
 
 
 const routes: RouteRecordRaw[] = [
@@ -13,12 +14,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/components/layout/AppLayout.vue'),
     // meta: { requiresAuth: true },
     children: [
-      {
-        path: '',
-        name: 'Home',
-        component: () => import('@/views/HomeView.vue'),
-        meta: { title: '홈' },
-      },
+      ...manRoutes,
       ...payRoutes,
       ...pubRoutes,
     ],
@@ -84,7 +80,7 @@ router.beforeEach(async (to) => {
 
   // 정회원이 인증 화면 직접 접근 시 홈으로
   if (to.name === 'MemberCert' && authStore.user?.memberType === 'FULL') {
-    return { name: 'Home' }
+    return { name: 'MAN000000A01M' }
   }
 
 })

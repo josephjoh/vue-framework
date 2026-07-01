@@ -22,7 +22,7 @@ export function useAuth() {
     if (authStore.user?.memberType === 'SEMI') {
       router.push({ name: 'MemberCert', query: { redirect: redirect ?? '/' } })
     } else {
-      router.push(redirect ?? { name: 'Home' })
+      router.push(redirect ?? { name: 'MAN000000A01M' })
     }
   }
 
@@ -34,7 +34,7 @@ export function useAuth() {
   async function upgradeMembership() {
     await authStore.upgradeMembership()
     const redirect = router.currentRoute.value.query.redirect as string | undefined
-    router.push(redirect ?? { name: 'Home' })
+    router.push(redirect ?? { name: 'MAN000000A01M' })
   }
 
   async function initAuth() {
